@@ -1,0 +1,29 @@
+# --- Python Specific ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+
+# --- Testing & Coverage ---
+.pytest_cache/
+.coverage
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+.results/
+
+# --- Linting ---
+.ruff_cache/
+.mypy_cache/
+
+# --- Environment Variables (Security!) ---
+.env
+.flaskenv
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
