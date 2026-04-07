@@ -48,3 +48,34 @@ def apply_promo_code(subtotal:int,promo_code:str,promo_codes:list[dict],current_
             return float(max(0, final_price))
    
     raise ValueError("invalid code")
+
+# Retourne le multiplicateur de prix selon l'heure et le jour. 
+# Le surge pricing augmente les frais de livraison en heures de pointe.
+def calculate_surge(hour:str, dayOfWeek:str)->float:
+   if not hour or not dayOfWeek:
+    raise ValueError("manque params") 
+
+   if hour < "10:00" or hour >="22:00":
+        return 0
+
+   day = dayOfWeek.strip().lower()
+
+   if day == "dimanche":
+        return 1.2
+
+   if day in ["lundi","mardi","mercredi","jeudi"]:
+     if "12:00" <= hour <= "13:30":
+        return 1.3
+     elif "19:00" <= hour <= "21:00":
+        return 1.5
+     else:
+        return 1.0
+
+   if day in ["vendredi","samedi"]:
+     if "19:00" <= hour <= "22:00":
+        return 1.8
+    
+
+    
+    
+

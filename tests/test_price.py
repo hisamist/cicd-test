@@ -1,6 +1,7 @@
 import pytest
 from src.price import calculate_delivery_fee
 from src.price import apply_promo_code
+from src.price import calculate_surge
 from datetime import datetime
 
 # Fonction 1: calculate_delivery_fee
@@ -133,4 +134,32 @@ def test_apply_promo_code_without_reduction_for_empty_code():
 def test_apply_promo_code_send_error_for_subtotal_negative():
     with pytest.raises(ValueError, match="negative"):
        apply_promo_code(-120,"",PROMO_CODES)
-    
+
+# Test Fonction 3 : calculateSurge(hour, dayOfWeek)
+def test_calculate_surge_send_normal_rate():
+    assert  calculate_surge("15:00","Mardi") == 1
+
+def test_calculate_surge_send_weekday_noon_rate():
+    assert  calculate_surge("12:30","Mercredi") == 1.3
+
+def test_calculate_surge_send_weekday_evening_rate():
+    assert  calculate_surge("20:00","Jeudi") == 1.5
+
+def test_calculate_surge_send_weekend_evening_rate():
+    assert  calculate_surge("21:00","Vendredi") == 1.8
+
+def test_calculate_surge_send_sunday_rate():
+    assert  calculate_surge("14:00","Dimanche") == 1.2
+
+def test_calculate_surge_send_close_rate():
+    assert  calculate_surge("09:59","Dimanche") == 0
+
+def test_calculate_surge_send_rate_by_border_open_hour():
+    assert  calculate_surge("10:00","Dimanche") == 1.2
+
+def test_calculate_surge_send_rate_by_border_close_hour():
+    assert  calculate_surge("22:01","Dimanche") == 0
+
+def test_calculate_surge_send_error_for_empty_params():
+    with pytest.raises(ValueError, match="manque params"):
+        assert  calculate_surge("","")
