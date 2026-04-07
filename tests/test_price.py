@@ -83,14 +83,14 @@ PROMO_CODES = [
         "type": "fixed",
         "value": 10,
         "minOrder": 0,
-        "expiresAt": datetime.now().strftime("%Y-%m-%d")
+        "expiresAt":"2026-04-08"
     },
     {
         "code": "TODAY30",
         "type": "fixed",
         "value": 10,
         "minOrder": 0,
-        "expiresAt": datetime.now().strftime("%Y-%m-%d")
+        "expiresAt": "2026-04-08"
     },
 ]
 
@@ -121,7 +121,7 @@ def test_apply_promo_prevent_negative_total():
     assert apply_promo_code(5,"PROMOMO",PROMO_CODES) == 0
 
 def test_apply_promo_works_on_expiry_day():
-    assert apply_promo_code(40,"TODAY30",PROMO_CODES) == 30
+    assert apply_promo_code(40,"TODAY30",PROMO_CODES,"2026-04-08") == 30
 
 # Entrees invalides
 def test_apply_promo_code_without_reduction_for_code_null():

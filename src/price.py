@@ -21,7 +21,7 @@ def calculate_delivery_fee(distance:int,weight:int):
         total_price += 1.5
     return total_price
 
-def apply_promo_code(subtotal:int,promo_code:str,promo_codes:list[dict]):
+def apply_promo_code(subtotal:int,promo_code:str,promo_codes:list[dict],current_date: str = None):
     if subtotal < 0 :
         raise ValueError("negative")
     if subtotal == 0:
@@ -29,13 +29,15 @@ def apply_promo_code(subtotal:int,promo_code:str,promo_codes:list[dict]):
     if not promo_code: 
         return subtotal
 
-    today_str = datetime.now().strftime("%Y-%m-%d")
+    if current_date is None:
+        current_date = datetime.now().strftime("%Y-%m-%d")
+
     discount_value = 0
     for code in promo_codes:
         if promo_code.strip() == code["code"]:
             if subtotal < code["minOrder"]:
                     raise ValueError("minOrder not met")
-            if code["expiresAt"] < today_str:
+            if code["expiresAt"] < current_date:
                     raise ValueError("code expired")
             if code["type"]=="percentage":
                 discount_value = round(subtotal*code["value"]/100)

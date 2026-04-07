@@ -185,3 +185,4 @@ def test_sort_students_send_empty_array_for_empty_imput():
     assert result[0]["age"] == 19
     assert result[1]["age"] == 20
     assert result[2]["age"] == 22
+
