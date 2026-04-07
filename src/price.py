@@ -1,3 +1,4 @@
+from datetime import datetime
 
 # Calcule les frais de livraison selon la distance et le poids de la commande.
 def calculate_delivery_fee(distance:int,weight:int):
@@ -19,3 +20,29 @@ def calculate_delivery_fee(distance:int,weight:int):
     else:
         total_price += 1.5
     return total_price
+
+def apply_promo_code(subtotal:int,promo_code:str,promo_codes:list[dict]):
+    if subtotal < 0 :
+        raise ValueError("negative")
+    if subtotal == 0:
+        return 0
+    if not promo_code: 
+        return subtotal
+
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    discount_value = 0
+    for code in promo_codes:
+        if promo_code.strip() == code["code"]:
+            if subtotal < code["minOrder"]:
+                    raise ValueError("minOrder not met")
+            if code["expiresAt"] < today_str:
+                    raise ValueError("code expired")
+            if code["type"]=="percentage":
+                discount_value = round(subtotal*code["value"]/100)
+            elif code["type"] == "fixed":
+                discount_value = code["value"]
+            
+            final_price = subtotal-discount_value
+            return float(max(0, final_price))
+   
+    raise ValueError("invalid code")
