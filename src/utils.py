@@ -36,3 +36,13 @@ def clamp(value:int,min:int, max:int) -> int:
       return max
     else:
       return  value
+
+# sort_students:
+def sort_students(students,sort_by,order="asc"):
+    if not students:
+        return []
+    is_reverse = (order == "desc")
+    return sorted(students, key=lambda x: x[sort_by],reverse=is_reverse)
+
+
+    
