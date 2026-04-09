@@ -5,6 +5,7 @@ from src.exercise.utils import clamp
 from src.exercise.utils import sort_students
 from src.exercise.utils import parse_price
 from src.exercise.utils import group_by
+from src.exercise.utils import calculate_discount
 import pytest
 
 
@@ -233,3 +234,43 @@ def test_group_by_single_group():
     GROUP = [{"name": "Alice", "role": "dev"}, {"name": "Charlie", "role": "dev"}]
     expected = {"dev": ["Alice", "Charlie"]}
     assert group_by(GROUP, "role") == expected
+
+
+# Test7 calculate discount(price, discountRules)
+def test_calculate_discount_error_for_empty_price():
+    with pytest.raises(ValueError, match="price required"):
+        assert calculate_discount(None, [{"type": "percentage", "value": 10}])
+
+
+def test_calculate_discount_send_original_price_for_empty_rules():
+    assert calculate_discount(100, []) == 100
+
+
+def test_calculate_discount_success_with_percentage_type():
+    assert calculate_discount(100, [{"type": "percentage", "value": 10}]) == 90
+
+
+def test_calculate_discount_success_with_fixed_type():
+    assert calculate_discount(100, [{"type": "fixed", "value": 5}]) == 95
+
+
+def test_calculate_discount_success_with_fixed_type_and_percentage_type():
+    assert (
+        calculate_discount(
+            100, [{"type": "percentage", "value": 10}, {"type": "fixed", "value": 5}]
+        )
+        == 85
+    )
+
+
+def test_buyXgetY_discount_4_items():
+    # Acheter 4 articles à 10€ chacun, obtenir 1 gratuit
+    # 4 articles => 3 payants et 1 gratuit => total de réduction = 10€
+    result = calculate_discount(
+        40, [{"type": "buyxgety", "buy": 3, "free": 1, "itemPrice": 10}]
+    )
+    assert result == 30  # 40€ - 10€ = 30€
+
+
+def test_calculate_discount_send_zero_for_nagative_result():
+    assert calculate_discount(10, [{"type": "fixed", "value": 15}]) == 0

@@ -48,7 +48,7 @@ def sort_students(students, sort_by, order="asc"):
     return sorted(students, key=lambda x: x[sort_by], reverse=is_reverse)
 
 
-# Convertit un prix sous differents formats en nombre. Ecrivez la fonction et ses tests.
+# A5 Convertit un prix sous differents formats en nombre. Ecrivez la fonction et ses tests.
 def parse_price(input) -> float | None:
     if not input:
         return None
@@ -66,7 +66,7 @@ def parse_price(input) -> float | None:
         return None
 
 
-# Regroupe un tableau d'objets par la valeur d'une cle. Ecrivez la fonction en TDD.
+# A6 Regroupe un tableau d'objets par la valeur d'une cle. Ecrivez la fonction en TDD.
 def group_by(members: list[dict], key: str):
     result = {}
     if not members or not key:
@@ -78,3 +78,53 @@ def group_by(members: list[dict], key: str):
         k = item[key]
         result.setdefault(k, []).append(item["name"])
     return result
+
+
+# A7 calculate discount
+def calculate_discount(price: float, discountRules: list[dict]) -> float:
+    if not price:
+        raise ValueError("price required")
+
+    if not discountRules:
+        return price
+
+    final_price = price
+
+    for rule in discountRules:
+        if "type" not in rule:
+            raise ValueError("type inconnu")
+
+        rule_type = rule["type"].strip().lower()
+
+        if rule_type == "percentage":
+            if "value" not in rule:
+                raise ValueError("value required for percentage discount")
+            final_price = (
+                final_price * (100 - rule["value"]) / 100
+            )  # Application de la réduction en pourcentage
+        elif rule_type == "fixed":
+            if "value" not in rule:
+                raise ValueError("value required for fixed discount")
+            final_price = (
+                final_price - rule["value"]
+            )  # Application de la réduction fixe
+        elif rule_type == "buyxgety":
+            # Vérifier que toutes les clés nécessaires sont présentes pour "buyXgetY"
+            if "buy" not in rule or "free" not in rule or "itemPrice" not in rule:
+                raise ValueError(
+                    "buy, free and itemPrice required for buyXgetY discount"
+                )
+
+            buy = rule["buy"]  # Nombre d'articles achetés
+            free = rule["free"]  # Nombre d'articles gratuits
+            itemPrice = rule["itemPrice"]  # Prix par article
+
+            article_count = int(price // itemPrice)
+            free_count = (article_count // buy) * free
+            final_price -= free_count * itemPrice
+        else:
+            raise ValueError(
+                "type inconnu"
+            )  # Type inconnu si ce n'est pas un des types attendus
+
+    return max(final_price, 0)  # Le prix final ne peut pas être inférieur à 0
