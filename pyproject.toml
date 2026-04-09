@@ -1,4 +1,6 @@
 [project]
+name = "cicd-test"
+version = "0.1.0"
 dependencies = [
   "flask"
 ]
@@ -24,3 +26,7 @@ lint-fix = "python -m ruff check . --fix"
 
 # Automatically fix linting errors and reformat code
 format = "python -m ruff format ."
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
