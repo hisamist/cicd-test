@@ -1,8 +1,8 @@
 import pytest
-from src.price import calculate_delivery_fee
-from src.price import apply_promo_code
-from src.price import calculate_surge
-from src.price import calculate_order_total
+from src.pricing.price import calculate_delivery_fee
+from src.pricing.price import apply_promo_code
+from src.pricing.price import calculate_surge
+from src.pricing.price import calculate_order_total
 from src.database import PROMO_CODES
 
 

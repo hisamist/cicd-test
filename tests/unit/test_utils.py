@@ -1,8 +1,8 @@
-from src.utils import capitalize
-from src.utils import calculateAverage
-from src.utils import slugify
-from src.utils import clamp
-from src.utils import sort_students
+from src.exercise.utils import capitalize
+from src.exercise.utils import calculateAverage
+from src.exercise.utils import slugify
+from src.exercise.utils import clamp
+from src.exercise.utils import sort_students
 
 
 # Test Fonction 1 : capitalize

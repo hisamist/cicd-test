@@ -1,6 +1,6 @@
-from src.validators import is_valid_email
-from src.validators import is_valid_password
-from src.validators import is_valid_age
+from src.exercise.validators import is_valid_email
+from src.exercise.validators import is_valid_password
+from src.exercise.validators import is_valid_age
 
 
 # Test Fonction1 : isValidEmail

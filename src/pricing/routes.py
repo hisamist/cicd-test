@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from src.price import calculate_order_total, apply_promo_code
+from src.pricing.price import calculate_order_total, apply_promo_code
 import src.database as db
 
 app = Flask(__name__)

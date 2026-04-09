@@ -1,5 +1,5 @@
 import pytest
-from src.routes import app
+from src.pricing.routes import app
 from src.database import reset_db
 
 
