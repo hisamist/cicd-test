@@ -2,12 +2,11 @@
 # Run all tests using pytest
 test = "python -m pytest"
 
-# Run tests and generate a coverage report for the 'app' module
-cov = "python -m pytest --cov=app"
+# Run tests and generate a coverage report for the 'src' module
+cov = "python -m pytest --cov=src --cov-fail-under=80"
 
 # Check code quality and style using Ruff (Linter)
 lint = "python -m ruff check ."
 
 # Automatically fix linting errors and reformat code
 format = "python -m ruff check . --fix && python -m ruff format ."
- 
