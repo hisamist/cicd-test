@@ -64,3 +64,17 @@ def parse_price(input) -> float | None:
         return response
     except (ValueError, AttributeError):
         return None
+
+
+# Regroupe un tableau d'objets par la valeur d'une cle. Ecrivez la fonction en TDD.
+def group_by(members: list[dict], key: str):
+    result = {}
+    if not members or not key:
+        raise ValueError("input required")
+
+    for item in members:
+        if key not in item:
+            raise ValueError("unmatch key")
+        k = item[key]
+        result.setdefault(k, []).append(item["name"])
+    return result

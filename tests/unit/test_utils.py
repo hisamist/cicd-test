@@ -4,6 +4,8 @@ from src.exercise.utils import slugify
 from src.exercise.utils import clamp
 from src.exercise.utils import sort_students
 from src.exercise.utils import parse_price
+from src.exercise.utils import group_by
+import pytest
 
 
 # Test Fonction 1 : capitalize
@@ -191,3 +193,43 @@ def test_parse_price_send_zero_for_free_str():
 
 def test_parse_price_send_null_for_invalid_text():
     assert parse_price("abc") is None
+
+
+# Test 6 groupBy(array, key)
+GROUP = [
+    {"name": "Alice", "role": "dev"},
+    {"name": "Bob", "role": "design"},
+    {"name": "Charlie", "role": "dev"},
+]
+
+
+def test_group_by_with_empty_array():
+    with pytest.raises(ValueError, match="input required"):
+        assert group_by([], "role")
+
+
+def test_group_by_with_null_members():
+    with pytest.raises(ValueError, match="input required"):
+        assert group_by(None, "role")
+
+
+def test_group_by_with_null_role():
+    with pytest.raises(ValueError, match="input required"):
+        assert group_by(GROUP, None)
+
+
+def test_group_by_error_with_unmatched_key():
+    with pytest.raises(ValueError, match="unmatch key"):
+        assert group_by(GROUP, "class")
+
+
+def test_group_send_sorted_result_by_key():
+    result = group_by(GROUP, "role")
+    expected_result = {"dev": ["Alice", "Charlie"], "design": ["Bob"]}
+    assert result == expected_result
+
+
+def test_group_by_single_group():
+    GROUP = [{"name": "Alice", "role": "dev"}, {"name": "Charlie", "role": "dev"}]
+    expected = {"dev": ["Alice", "Charlie"]}
+    assert group_by(GROUP, "role") == expected
