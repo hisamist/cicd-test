@@ -1,5 +1,6 @@
 # Retourne True si l'email est valide (contient @ et un domaine avec un point).
 
+
 def is_valid_email(email: str) -> bool:
     if not email:
         return False
@@ -19,9 +20,9 @@ def is_valid_email(email: str) -> bool:
         return False
 
     return True
-    
-       
-"""  
+
+
+"""
     # Retourne un objet { valid: boolean, errors: string[] }. Regles :
         • Minimum 8 caracteres
         • Au moins 1 majuscule
@@ -29,18 +30,17 @@ def is_valid_email(email: str) -> bool:
         • Au moins 1 chiffre
         • Au moins 1 caractere special (!@#$%^&*)
 """
-def is_valid_password(pw:str):
-    response = {
-        "valid":False,
-        "errors":[]
-    }
-    if not pw: 
+
+
+def is_valid_password(pw: str):
+    response = {"valid": False, "errors": []}
+    if not pw:
         response["valid"] = False
         return response
-    
-    if len(pw) < 8 : 
+
+    if len(pw) < 8:
         response["errors"].append("trop court")
-    
+
     if not any(c.isupper() for c in pw):
         response["errors"].append("pas de majuscule")
 
@@ -60,14 +60,14 @@ def is_valid_password(pw:str):
 
 
 # Retourne true si l'age est un entier entre 0 et 150
-def is_valid_age(age:int)->bool:
-    if not age and age !=0 : 
+def is_valid_age(age: int) -> bool:
+    if not age and age != 0:
         return False
 
-    if not isinstance(age,int):
+    if not isinstance(age, int):
         return False
 
-    if age > 150 or age < 0: 
+    if age > 150 or age < 0:
         return False
 
     return True

@@ -7,6 +7,7 @@ cov = "python -m pytest --cov=src --cov-fail-under=80"
 
 # Check code quality and style using Ruff (Linter)
 lint = "python -m ruff check ."
+lint-fix = "python -m ruff check . --fix"
 
 # Automatically fix linting errors and reformat code
-format = "python -m ruff check . --fix && python -m ruff format ."
+format = "python -m ruff format ."
