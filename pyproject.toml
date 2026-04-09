@@ -1,3 +1,16 @@
+[project]
+dependencies = [
+  "flask"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "pytest-cov",
+  "ruff",
+  "taskipy"
+]
+
 [tool.taskipy.tasks]
 # Run all tests using pytest
 test = "python -m pytest"
