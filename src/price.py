@@ -74,7 +74,78 @@ def calculate_surge(hour:str, dayOfWeek:str)->float:
    if day in ["vendredi","samedi"]:
      if "19:00" <= hour <= "22:00":
         return 1.8
+
+"""
+La fonction principale qui assemble tout :
+
+1. Calculer le sous-total des items (somme des price * quantity)
+2. Appliquer le code promo (si fourni)
+3. Calculer les frais de livraison
+4. Appliquer le multiplicateur surge
+5. Retourner : { subtotal, discount, deliveryFee, surge, total } 
+"""
+def calculate_order_total(items:list[dict], distance:float, weight:float, promo_code:str, hour:str, dayOfWeek:str,current_date:str)->float:
+    if len(items) == 0 :
+        raise ValueError("empty items")
+    if hour < "10:00" or hour >="22:00":
+        raise ValueError("Hors de service")
+
+    subtotal = 0
+    for i in items : 
+        if i["price"] <= 0:
+            raise ValueError("Le prix est inadequate")
+        subtotal += i["price"]*i["quantity"]
     
+    PROMO_CODES = [
+        {
+            "code": "BIENVENUE20",
+            "type": "percentage",
+            "value": 20,
+            "minOrder": 15.00,
+            "expiresAt": "2026-12-31"
+        },
+        {
+            "code": "PROMO5",
+            "type": "fixed",
+            "value": 5,
+            "minOrder": 10.00,
+            "expiresAt": "2026-12-31"
+        },
+        {
+            "code": "PROMO10",
+            "type": "fixed",
+            "value": 10,
+            "minOrder": 30.00,
+            "expiresAt": "2026-12-31"
+        },
+
+        {
+            "code": "PROMOMO",
+            "type": "fixed",
+            "value": 10,
+            "minOrder": 0,
+            "expiresAt":"2027-04-09"
+        },
+        {
+            "code": "TODAY30",
+            "type": "fixed",
+            "value": 10,
+            "minOrder": 0,
+            "expiresAt": "2026-04-08"
+        },
+    ]
+    discount = apply_promo_code(subtotal,promo_code,PROMO_CODES,current_date)
+    surge_multiplier = calculate_surge(hour,dayOfWeek)
+    final_delivery_fee = calculate_delivery_fee(distance,weight)*surge_multiplier
+    total = discount + final_delivery_fee
+
+    return {
+        "subtotal": subtotal,
+        "discount": discount,
+        "deliveryFee": final_delivery_fee,
+        "surge": surge_multiplier,
+        "total": total
+    }
 
     
     

@@ -2,6 +2,7 @@ import pytest
 from src.price import calculate_delivery_fee
 from src.price import apply_promo_code
 from src.price import calculate_surge
+from src.price import calculate_order_total
 from datetime import datetime
 
 # Fonction 1: calculate_delivery_fee
@@ -84,7 +85,7 @@ PROMO_CODES = [
         "type": "fixed",
         "value": 10,
         "minOrder": 0,
-        "expiresAt":"2026-04-08"
+        "expiresAt":"2027-04-09"
     },
     {
         "code": "TODAY30",
@@ -162,4 +163,77 @@ def test_calculate_surge_send_rate_by_border_close_hour():
 
 def test_calculate_surge_send_error_for_empty_params():
     with pytest.raises(ValueError, match="manque params"):
-        assert  calculate_surge("","")
+        calculate_surge("","")
+
+# Test Fonction4: Calculate Order Total
+TEST_DATE = "2026-04-09"
+def test_calculate_order_total_success():
+    # 2 pizzas a 12.50€ + 5 km + mardi 15h without discount
+    result = calculate_order_total([{ "name": "Pizza", "price": 12.50, "quantity": 2 }],5,2,"","15:00","Mercredi",TEST_DATE) 
+    assert result["subtotal"]== 25
+    assert result["discount"]== 25
+    assert result["deliveryFee"]==3
+    assert result["surge"]==1.0
+    assert result["total"]==28
+
+def test_calculate_order_total_success_with_20pourcent_discount():
+    # 2 pizzas a 20€ + 5 km + mardi 15h without discount 20 perrcent coupon
+    result = calculate_order_total([{ "name": "Pizza", "price": 20, "quantity": 2 }],5,2,"BIENVENUE20","15:00","Mercredi",TEST_DATE) 
+    assert result["subtotal"]== 40
+    assert result["discount"]== 32 #20 percents off
+    assert result["deliveryFee"]==3
+    assert result["surge"]==1.0
+    assert result["total"]==35
+
+def test_calculate_order_total_success_with_fix_discount():
+    # 2 pizzas a 20€ + 5 km + mardi 15h without discount 20 perrcent coupon
+    result = calculate_order_total([{ "name": "Pizza", "price": 20, "quantity": 2 }],5,2,"PROMO10","15:00","Mercredi",TEST_DATE) 
+    assert result["subtotal"]== 40
+    assert result["discount"]== 30 #10 euros moins
+    assert result["deliveryFee"]==3
+    assert result["surge"]==1.0
+    assert result["total"]==33
+
+def test_calculate_order_total_success_with_surge_for_friday_night():
+    # 2 pizzas a 12.50€ + 5 km + vendredi 20h 
+    result = calculate_order_total([{ "name": "Pizza", "price": 20, "quantity": 2 }],5,2,"","20:00","Vendredi",TEST_DATE) 
+    assert result["subtotal"]== 40
+    assert result["discount"]== 40
+    assert result["surge"]==1.8
+    assert result["deliveryFee"]==5.4
+    assert result["total"]==45.4
+
+def test_calculate_order_total_success_with_surge_for_friday_night_with_discount():
+    # 2 pizzas a 12.50€ + 5 km + vendredi 20h + discount fix 10 euros
+    result = calculate_order_total([{ "name": "Pizza", "price": 20, "quantity": 2 }],5,2,"PROMO10","20:00","Vendredi",TEST_DATE) 
+    assert result["subtotal"]== 40
+    assert result["discount"]== 30
+    assert result["surge"]==1.8
+    assert result["deliveryFee"]==5.4
+    assert result["total"]==35.4
+
+def test_calculate_order_total_send_error_for_empty_items():
+    with pytest.raises(ValueError, match="empty items"):
+        calculate_order_total([],1,2,"PROMO5","16:00","Mercredi",TEST_DATE) 
+
+def test_calculate_order_total_send_error_for_items_price_zero():
+    with pytest.raises(ValueError, match="Le prix est inadequate"):
+        calculate_order_total([{ "name": "Pizza", "price": 0, "quantity": 2 }],1,2,"PROMO5","16:00","Mercredi",TEST_DATE) 
+    
+def test_calculate_order_total_send_error_for_negative_price_of_item():
+    with pytest.raises(ValueError, match="Le prix est inadequate"):
+        calculate_order_total([{ "name": "Pizza", "price": -10, "quantity": 2 }],1,2,"PROMO5","16:00","Mercredi",TEST_DATE)   
+
+def test_calculate_order_total_send_error_for_out_of_service():
+    with pytest.raises(ValueError, match="Hors de service"):
+        calculate_order_total([{ "name": "Pizza", "price": 20, "quantity": 2 }],1,2,"PROMO5","23:00","Mercredi",TEST_DATE)     
+
+def test_calculate_order_total_send_error_for_distance_limit():
+     # Over 15 km
+    with pytest.raises(ValueError, match="refuse"):
+        calculate_order_total([{ "name": "Pizza", "price": 20, "quantity": 2 }],15,2,"PROMO5","16:00","Mercredi",TEST_DATE)     
+
+def test_calculate_order_total_send_error_for_expiration_code():
+     # code expired
+    with pytest.raises(ValueError, match="code expired"):
+        calculate_order_total([{ "name": "Pizza", "price": 20, "quantity": 2 }],15,2,"PROMO5","16:00","Mercredi","2027-12-31") 
