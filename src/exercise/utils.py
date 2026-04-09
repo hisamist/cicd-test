@@ -46,3 +46,21 @@ def sort_students(students, sort_by, order="asc"):
         return []
     is_reverse = order == "desc"
     return sorted(students, key=lambda x: x[sort_by], reverse=is_reverse)
+
+
+# Convertit un prix sous differents formats en nombre. Ecrivez la fonction et ses tests.
+def parse_price(input) -> float | None:
+    if not input:
+        return None
+    try:
+        input_str = str(input).strip()
+        if input_str.lower() == "gratuit":
+            return 0.0
+        input_str = input_str.replace("€", "").replace("(nombre)", "").strip()
+        input_str = input_str.replace(",", ".")
+        response = float(input_str)
+        if response < 0:
+            return None
+        return response
+    except (ValueError, AttributeError):
+        return None

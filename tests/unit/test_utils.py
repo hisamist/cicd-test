@@ -3,6 +3,7 @@ from src.exercise.utils import calculateAverage
 from src.exercise.utils import slugify
 from src.exercise.utils import clamp
 from src.exercise.utils import sort_students
+from src.exercise.utils import parse_price
 
 
 # Test Fonction 1 : capitalize
@@ -153,3 +154,40 @@ def test_sort_students_send_array_asc_as_default():
     assert result[0]["age"] == 19
     assert result[1]["age"] == 20
     assert result[2]["age"] == 22
+
+
+# Test Fonction parse Price
+def test_parse_price_send_null_for_null_imput():
+    assert parse_price(None) is None
+
+
+def test_parse_price_send_null_for_negative_imput():
+    assert parse_price("-5") is None
+
+
+def test_parse_price_send_positive_numbers_dot():
+    assert parse_price("12.99") == 12.99
+
+
+def test_parse_price_send_positive_numbers_comma():
+    assert parse_price("12,99") == 12.99
+
+
+def test_parse_price_send_positive_numbers_for_with_euro_suffix():
+    assert parse_price("12,99 €") == 12.99
+
+
+def test_parse_price_send_positive_numbers_for_with_euro_prefix():
+    assert parse_price("€12.99") == 12.99
+
+
+def test_parse_price_send_positive_numbers_for_with_extra_text():
+    assert parse_price("12.99 (nombre)") == 12.99
+
+
+def test_parse_price_send_zero_for_free_str():
+    assert parse_price("gratuit") == 0
+
+
+def test_parse_price_send_null_for_invalid_text():
+    assert parse_price("abc") is None
