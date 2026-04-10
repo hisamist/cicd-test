@@ -12,7 +12,7 @@ def client():
 
 
 # Tests pour POST /orders/simulate
-def test_simulate_normal_order(client):
+def test_should_return_200_with_correct_total_when_order_is_valid(client):
     """1. Commande normale → 200 + detail correct"""
     payload = {
         "items": [{"name": "Pizza", "price": 10.0, "quantity": 2}],
@@ -27,7 +27,7 @@ def test_simulate_normal_order(client):
     assert response.json["total"] == 23.0  # 20 (subtotal) + 3 (delivery)
 
 
-def test_simulate_with_promo(client):
+def test_should_apply_discount_when_valid_promo_code_is_given(client):
     """2. Avec code promo valide → reduction appliquee"""
     payload = {
         "items": [{"name": "Pizza", "price": 25.0, "quantity": 2}],  # 50.0
@@ -43,7 +43,7 @@ def test_simulate_with_promo(client):
     assert response.json["total"] == 43.0  # (50-10) + 3
 
 
-def test_simulate_error_with_promo_expired(client):
+def test_should_return_400_when_simulating_with_expired_promo(client):
     """3. Avec code promo expired → 400 + message error"""
     payload = {
         "items": [{"name": "Pizza", "price": 25.0, "quantity": 2}],  # 50.0
@@ -58,7 +58,7 @@ def test_simulate_error_with_promo_expired(client):
     assert "expired" in response.json["error"]
 
 
-def test_simulate_error_with_empty_items(client):
+def test_should_return_400_when_items_are_empty(client):
     """4 Panier vide"""
     payload = {
         "items": [],
@@ -73,7 +73,7 @@ def test_simulate_error_with_empty_items(client):
     assert "empty" in response.json["error"]
 
 
-def test_simulate_error_with_above_distance_limit(client):
+def test_should_return_400_when_simulate_distance_exceeds_limit(client):
     """5 Hors zone (> 10 km) → 400"""
     payload = {
         "items": [{"name": "Pizza", "price": 25.0, "quantity": 2}],  # 50.0
@@ -88,7 +88,7 @@ def test_simulate_error_with_above_distance_limit(client):
     assert "refus" in response.json["error"]
 
 
-def test_simulate_error_with_close_service(client):
+def test_should_return_400_when_service_is_closed(client):
     """6 Ferme 22:00"""
     payload = {
         "items": [{"name": "Pizza", "price": 25.0, "quantity": 2}],
@@ -103,7 +103,7 @@ def test_simulate_error_with_close_service(client):
     assert "Hors de service" in response.json["error"]
 
 
-def test_simulate_with_multiplied_price(client):
+def test_should_apply_surge_and_promo_when_friday_night_with_discount(client):
     """7. Surge (Vendredi 20h) + Promo -> Calcul combiné"""
     payload = {
         "items": [{"name": "Pizza", "price": 25.0, "quantity": 2}],  # 50.0
@@ -122,7 +122,7 @@ def test_simulate_with_multiplied_price(client):
 
 
 # Tests pour POST /orders
-def test_create_order_success(client):
+def test_should_return_201_with_id_when_order_is_valid(client):
     """1. Commande valide → 201 + ID présent"""
     payload = {
         "items": [{"name": "Pizza", "price": 10.0, "quantity": 1}],
@@ -138,7 +138,7 @@ def test_create_order_success(client):
     assert response.json["id"] == 1
 
 
-def test_order_is_retrievable(client):
+def test_should_return_order_when_retrieved_by_existing_id(client):
     """2. Retrouvable via GET /orders/:id"""
     payload = {
         "items": [{"name": "A", "price": 10, "quantity": 1}],
@@ -155,7 +155,7 @@ def test_order_is_retrievable(client):
     assert get_res.json["id"] == order_id
 
 
-def test_multiple_orders_different_ids(client):
+def test_should_assign_different_ids_when_multiple_orders_created(client):
     """3. Deux commandes → deux IDs différents"""
     payload = {
         "items": [{"name": "A", "price": 10, "quantity": 1}],
@@ -172,7 +172,7 @@ def test_multiple_orders_different_ids(client):
     assert res2.json["id"] == 2
 
 
-def test_create_order_invalid(client):
+def test_should_return_400_when_create_order_distance_exceeds_limit(client):
     """4. Commande invalide (ex: distance > 10km) → 400"""
     payload = {
         "items": [{"name": "Pizza", "price": 10.0, "quantity": 1}],
@@ -186,7 +186,7 @@ def test_create_order_invalid(client):
     assert "refus" in response.json["error"]
 
 
-def test_invalid_order_not_saved(client):
+def test_should_not_save_order_when_items_are_empty(client):
     """5. Vérifier que la commande invalide n'est PAS enregistrée"""
     payload = {
         "items": [],
@@ -202,7 +202,7 @@ def test_invalid_order_not_saved(client):
 
 
 # Tests pour GET /orders/:id
-def test_get_order_by_id_exists(client):
+def test_should_return_200_with_order_data_when_id_exists(client):
     """1. ID existant → 200 + commande complète"""
     payload = {
         "items": [{"name": "Pizza", "price": 10.0, "quantity": 1}],
@@ -222,14 +222,14 @@ def test_get_order_by_id_exists(client):
     assert "items" in response.json
 
 
-def test_get_order_by_id_not_found(client):
+def test_should_return_404_when_order_id_not_found(client):
     """2. ID inexistant → 404"""
     response = client.get("/orders/999")
     assert response.status_code == 404
     assert "error" in response.json
 
 
-def test_get_order_payload_structure(client):
+def test_should_return_complete_structure_when_order_is_retrieved(client):
     """3. La structure retournée est correcte"""
     payload = {
         "items": [{"name": "Test", "price": 5.0, "quantity": 1}],
@@ -249,7 +249,7 @@ def test_get_order_payload_structure(client):
 
 
 # Test POST /promo/validate
-def test_promo_valid(client):
+def test_should_return_200_with_valid_status_when_promo_code_is_valid(client):
     """1. Code valide → 200 + détails"""
     payload = {
         "promoCode": "BIENVENUE20",
@@ -263,7 +263,7 @@ def test_promo_valid(client):
     assert response.json["type"] == "percentage"
 
 
-def test_promo_expired(client):
+def test_should_return_400_when_validating_expired_promo_code(client):
     """2. Code expiré (TODAY30 expire le 08/04/2026) → 400"""
     payload = {
         "promoCode": "TODAY30",
@@ -275,7 +275,7 @@ def test_promo_expired(client):
     assert "expired" in response.json["error"]
 
 
-def test_promo_min_order_not_met(client):
+def test_should_return_400_when_subtotal_is_below_minimum_order(client):
     """3. Commande sous le minimum (PROMO10 demande 30€) → 400"""
     payload = {
         "promoCode": "PROMO10",
@@ -287,7 +287,7 @@ def test_promo_min_order_not_met(client):
     assert "minOrder" in response.json["error"]
 
 
-def test_promo_unknown(client):
+def test_should_return_404_when_promo_code_is_unknown(client):
     """4. Code inconnu → 404"""
     payload = {
         "promoCode": "FauxCode123",
@@ -299,7 +299,7 @@ def test_promo_unknown(client):
     assert response.json["error"] == "Code inconnu"
 
 
-def test_promo_missing_code_in_body(client):
+def test_should_return_400_when_promo_code_is_missing_from_body(client):
     """5. Sans code dans le body → 400"""
     payload = {
         "subtotal": 100  # Manque promoCode
